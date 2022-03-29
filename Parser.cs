@@ -17,13 +17,36 @@ namespace Graveyard
             public string Name;
             public DateTime From;
             public DateTime To;
+            public int Month {
+                get {
+                    var years = To.Year - From.Year;
+                    var month = To.Month - From.Month;
+
+                    return years * 12 + month;
+                }
+            }
+            public int Years {
+                get {
+                    return Month / 12;
+                }
+            }
+
+            public static string Header =>
+                "プロジェクト名,生年,享年,年齢,月齢";
+
+            public string Body =>
+                $"{Name},{ToStr(From)},{ToStr(To)},{Years},{Month}";
+
+            private string ToStr(DateTime d) =>
+                d.ToString("yyyy/MM");
+
         }
 
         readonly string HTML;
         readonly string CSV;
         readonly List<Project> Projects = new List<Project>();
 
-        public Parser(string html,string csv)
+        public Parser(string html, string csv)
         {
             HTML = html;
             CSV = csv;
@@ -49,7 +72,7 @@ namespace Graveyard
                     if (h2 == null) {
                         throw new Exception("h2 failed.");
                     }
-                    project.Name = h2.TextContent;
+                    project.Name = TrimMiddle(h2.TextContent);
 
                     //imgの次のdivから日付を取得
                     var time = tomb.NextElementSibling.QuerySelectorAll("time");
@@ -61,6 +84,7 @@ namespace Graveyard
 
                     //リストに加える
                     Projects.Add(project);
+                    Console.WriteLine($"{project.Body}");
 
                 } catch (Exception e) {
                     Console.WriteLine($"!ERROR! : {e}");
@@ -70,6 +94,32 @@ namespace Graveyard
 
             //デバッグ出力
             Console.WriteLine($"find tombstones : {Projects.Count}");
+
+        }
+
+        public void OutputCSV()
+        {
+            using (var writer = new StreamWriter(CSV)) {
+                //ヘッダ行
+                writer.WriteLine(Project.Header);
+                //ボディー
+                foreach (var project in Projects) {
+                    writer.WriteLine(project.Body);
+                }
+            }
+        }
+
+
+        private string TrimMiddle(string str)
+        {
+            var separators = new char[] { ' ', '\n', '\t' };
+            var names = str.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            var ret = "";
+            foreach (var n in names) {
+                ret += n + " ";
+            }
+
+            return ret.Trim();
         }
     }
 }

@@ -14,6 +14,7 @@ namespace Graveyard
 
             foreach (var parser in list) {
                 parser.Parse();
+                parser.OutputCSV();
             }
 
         }
