@@ -9,4 +9,13 @@
     <PackageReference Include="AngleSharp" Version="0.16.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="google.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="microsoft.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
